@@ -4,6 +4,7 @@ import akka.actor._
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import akka.util.ByteString
+import hackfm.FuncmesVoter.{VotesToCast, VoteAck}
 
 import scala.language.postfixOps
 import scala.xml.Node
@@ -18,6 +19,10 @@ class WebpageProcessor extends Actor with ActorLogging {
     case WebpageProcessor.WebpageSource(source, req) =>
       val html = HtmlParser(source)
       voter ! processWebpage(html, req)
+
+    case akka.actor.Status.Failure(ee) =>
+      log.error(ee, "POINTS REQUEST FAILED")
+      context.parent ! FuncmesVoter.FinishedCastingVotes
   }
 
   def processWebpage(html: Node, req: ActorRef) = {
