@@ -22,10 +22,11 @@ class WebpageProcessor extends Actor with ActorLogging {
 
   def processWebpage(html: Node, req: ActorRef) = {
     val employeeRegex = """(\w*) \((\d*) pontos\)""".r
-    // val targetEmployee = """[Jj][Uu]""".r
+    val targetEmployee = """[Jj][Uu]""".r
     // val targetEmployee = "Nic".r
-    val targetEmployee = "Asp".r
+    // val targetEmployee = "Asp".r
     // val targetEmployee = "Maroja".r
+    // val targetEmployee = "Edu".r
 
     def employees = for {
       node <- (html \\ "div").toStream
@@ -47,14 +48,14 @@ class WebpageProcessor extends Actor with ActorLogging {
 
       case Some(target) =>
         val data = (dataA ++ dataB.tail) sortBy (-_.points) toList
-        // val maxOthers = data.head.points
-        val maxOthers = data.reverse.drop(2).head.points
+        val maxOthers = data.head.points
+        // val maxOthers = data.drop(2).head.points // third
+        // val maxOthers = data.reverse.drop(2).head.points
         // val maxOthers = data.reverse.head.points // second to last
 
         val error = target.points - (maxOthers + 1)
         val actionRaw = -error
-        // val action = clamp(0, 10)(actionRaw)
-        val action = clamp(0, 2)(actionRaw)
+        val action = clamp(0, 10)(actionRaw)
 
         log.info(s"target:$target max:$maxOthers votes:$action rapa:$data")
 

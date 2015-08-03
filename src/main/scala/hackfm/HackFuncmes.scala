@@ -4,7 +4,7 @@ import akka.actor.{ActorSystem, Props}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-object GetFuncmesVotes extends App {
+object HackFuncmes extends App {
   val REQUEST_PERIOD = 10 seconds
 
   implicit val system = ActorSystem()
