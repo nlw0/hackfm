@@ -41,7 +41,7 @@ class WebpageRequester extends Actor with ActorLogging {
       context.become(awaitingCommand())
 
     case WebpageRequester.RequestWebpage =>
-      log.info("someone seems to be looking for a request... not gonna happen")
+      log.info("Someone seems to be looking for a request right now... not gonna happen")
 
   }
 }
