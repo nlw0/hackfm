@@ -24,15 +24,13 @@ class WebpageRequester extends Actor with ActorLogging {
 
   def awaitingCommand(): Receive = {
     case WebpageRequester.RequestWebpage =>
+      log.info(s"NEW ITERATION")
       val request = HttpRequest(uri = "/", headers = headers)
       val connectionFlow = Http().outgoingConnection("funcmes.herokuapp.com")
       val responseFuture = Source.single(request) via connectionFlow runWith Sink.head
 
       responseFuture map (r => WebpageProcessor.WebpageSource(r.entity.dataBytes, self)) pipeTo pageProcessor
-      context.become(awaitingVoteAcks())
-  }
 
-  def awaitingVoteAcks(): Receive = {
     case FuncmesVoter.VoteAck(uid, n, status) =>
       log.info(s"Acked vote $n to $uid (status:$status)")
 
@@ -40,9 +38,9 @@ class WebpageRequester extends Actor with ActorLogging {
       log.info(s"Awaiting next iteration")
       context.become(awaitingCommand())
 
-    case WebpageRequester.RequestWebpage =>
-      log.info("Someone seems to be looking for a request right now... not gonna happen")
-
+    case x =>
+      println("WTF?")
+      println(x)
   }
 }
 

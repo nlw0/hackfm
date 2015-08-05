@@ -1,16 +1,14 @@
 package hackfm
 
-import akka.pattern.pipe
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.PredefinedToEntityMarshallers._
 import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{Cookie, HttpCookiePair}
+import akka.pattern.pipe
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
-
-import scala.concurrent.duration._
 
 class FuncmesVoter extends Actor with ActorLogging {
 
@@ -30,6 +28,14 @@ class FuncmesVoter extends Actor with ActorLogging {
     case VotesToCast(uid, n, req) =>
       requestVote(uid) pipeTo self
       context.become(processHtml(uid, n, req))
+
+    case akka.actor.Status.Failure(ee) =>
+      log.error(ee, "WTF error received on voter but should be in another state")
+
+    case x =>
+      println("WTF????")
+      println(x)
+
   }
 
   def processHtml(uid: Int, n: Int, req: ActorRef): Receive = {
@@ -49,6 +55,11 @@ class FuncmesVoter extends Actor with ActorLogging {
       req ! VoteAck(uid, n, status = false)
       self ! VotesToCast(uid, n - 1, req)
       context.become(castingVotes())
+
+    case x =>
+      println("WTF???????")
+      println(x)
+
   }
 
   def requestVote(uid: Int) = {

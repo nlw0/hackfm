@@ -17,12 +17,18 @@ class WebpageProcessor extends Actor with ActorLogging {
 
   def receive = {
     case WebpageProcessor.WebpageSource(source, req) =>
+      log.info("Parsing webpage")
       val html = HtmlParser(source)
       voter ! processWebpage(html, req)
 
     case akka.actor.Status.Failure(ee) =>
       log.error(ee, "POINTS REQUEST FAILED")
       context.parent ! FuncmesVoter.FinishedCastingVotes
+
+    case x =>
+      println("WTF??")
+      println(x)
+
   }
 
   def processWebpage(html: Node, req: ActorRef) = {
